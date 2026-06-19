@@ -7,6 +7,13 @@ import {
   Terminal,
 } from "lucide-react";
 import { NavLink } from "react-router";
+import { mockQuests } from "../../data";
+import { getTotalCompletedXp } from "../../features/progress/progressUtils";
+import {
+  getNextRankForXp,
+  getRankForXp,
+  getRankProgress,
+} from "../../features/progress/ranks";
 import { cn } from "../../lib/cn";
 
 const navItems = [
@@ -39,6 +46,11 @@ const navItems = [
 ];
 
 export function Sidebar() {
+  const totalXp = getTotalCompletedXp(mockQuests);
+  const currentRank = getRankForXp(totalXp);
+  const nextRank = getNextRankForXp(totalXp);
+  const rankProgress = getRankProgress(totalXp);
+
   return (
     <aside className="flex min-h-screen w-[280px] flex-col border-r border-zinc-800 bg-[#080808]">
       <div className="border-b border-zinc-800 p-6">
@@ -88,14 +100,22 @@ export function Sidebar() {
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-zinc-500">
             Current Rank
           </p>
+
           <p className="mt-2 font-mono text-lg font-black text-white">
-            Syntax Squire
+            {currentRank.title}
           </p>
+
           <div className="mt-4 h-2 border border-zinc-700 bg-zinc-950">
-            <div className="h-full w-[36%] bg-[#a3ff12]" />
+            <div
+              className="h-full bg-[#a3ff12]"
+              style={{ width: `${rankProgress.percentage}%` }}
+            />
           </div>
+
           <p className="mt-2 font-mono text-xs text-zinc-500">
-            360 XP / 1,000 XP
+            {nextRank
+              ? `${totalXp.toLocaleString()} XP / ${nextRank.minXp.toLocaleString()} XP`
+              : `${totalXp.toLocaleString()} XP / MAX`}
           </p>
         </div>
       </div>
