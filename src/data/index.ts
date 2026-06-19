@@ -1,0 +1,1 @@
+export { mockQuests } from './mockQuest'
