@@ -7,7 +7,7 @@ import {
   Terminal,
 } from "lucide-react";
 import { NavLink } from "react-router";
-import { mockQuests } from "../../data";
+import { useQuests } from "../../features/quests/QuestContext";
 import { getTotalCompletedXp } from "../../features/progress/progressUtils";
 import {
   getNextRankForXp,
@@ -46,13 +46,15 @@ const navItems = [
 ];
 
 export function Sidebar() {
-  const totalXp = getTotalCompletedXp(mockQuests);
+  const { quests } = useQuests();
+
+  const totalXp = getTotalCompletedXp(quests);
   const currentRank = getRankForXp(totalXp);
   const nextRank = getNextRankForXp(totalXp);
   const rankProgress = getRankProgress(totalXp);
 
   return (
-    <aside className="flex min-h-screen w-[280px] flex-col border-r border-zinc-800 bg-[#080808]">
+    <aside className="flex min-h-screen w-70 flex-col border-r border-zinc-800 bg-[#080808]">
       <div className="border-b border-zinc-800 p-6">
         <div className="flex items-center gap-3">
           <div className="flex size-11 items-center justify-center border-2 border-[#a3ff12] bg-black shadow-[4px_4px_0_#a3ff12]">

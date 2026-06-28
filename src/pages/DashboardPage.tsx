@@ -4,7 +4,7 @@ import { NextRecommendedQuestCard } from "../components/quest/NextRecommendedQue
 import { QuestPreviewCard } from "../components/quest/QuestPreviewCard";
 import { PageShell } from "../components/layout/PageShell";
 import { StatCard } from "../components/ui/StatCard";
-import { mockQuests } from "../data";
+import { useQuests } from "../features/quests/QuestContext";
 import {
   getActiveQuests,
   getBossQuestPreview,
@@ -22,14 +22,16 @@ import {
 } from "../features/progress/ranks";
 
 export function DashboardPage() {
-  const totalXp = getTotalCompletedXp(mockQuests);
-  const completedQuests = getCompletedQuests(mockQuests);
-  const activeQuests = getActiveQuests(mockQuests);
-  const recentCompletions = getRecentCompletions(mockQuests);
-  const bossQuest = getBossQuestPreview(mockQuests);
-  const nextRecommendedQuest = getNextRecommendedQuest(mockQuests);
-  const longestStreak = getLongestCompletionStreak(mockQuests);
-  const completionRate = getCompletionRate(mockQuests);
+  const { quests } = useQuests();
+
+  const totalXp = getTotalCompletedXp(quests);
+  const completedQuests = getCompletedQuests(quests);
+  const activeQuests = getActiveQuests(quests);
+  const recentCompletions = getRecentCompletions(quests);
+  const bossQuest = getBossQuestPreview(quests);
+  const nextRecommendedQuest = getNextRecommendedQuest(quests);
+  const longestStreak = getLongestCompletionStreak(quests);
+  const completionRate = getCompletionRate(quests);
 
   const currentRank = getRankForXp(totalXp);
   const nextRank = getNextRankForXp(totalXp);
@@ -212,7 +214,7 @@ export function DashboardPage() {
                   Total Quests
                 </span>
                 <span className="font-mono text-sm font-black text-white">
-                  {mockQuests.length}
+                  {quests.length}
                 </span>
               </div>
 
@@ -221,10 +223,7 @@ export function DashboardPage() {
                   Boss Quests
                 </span>
                 <span className="font-mono text-sm font-black text-white">
-                  {
-                    mockQuests.filter((quest) => quest.difficulty === "Boss")
-                      .length
-                  }
+                  {quests.filter((quest) => quest.difficulty === "Boss").length}
                 </span>
               </div>
 
@@ -233,10 +232,7 @@ export function DashboardPage() {
                   Archived
                 </span>
                 <span className="font-mono text-sm font-black text-white">
-                  {
-                    mockQuests.filter((quest) => quest.status === "Archived")
-                      .length
-                  }
+                  {quests.filter((quest) => quest.status === "Archived").length}
                 </span>
               </div>
             </div>

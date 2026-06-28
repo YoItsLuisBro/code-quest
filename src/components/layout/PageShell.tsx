@@ -14,7 +14,7 @@ export function PageShell({
   children,
 }: PageShellProps) {
   return (
-    <section className="mx-auto w-full max-w-[1400px]">
+    <section className="mx-auto w-full max-w-350">
       <div className="mb-8 border-2 border-zinc-800 bg-[#0b0b0b] p-6 shadow-[8px_8px_0_#1f1f1f]">
         <p className="font-mono text-xs uppercase tracking-[0.35em] text-[#a3ff12]">
           {eyebrow}

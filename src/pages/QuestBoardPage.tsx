@@ -1,10 +1,10 @@
-import { PlusSquare } from "lucide-react";
+import { PlusSquare, RotateCcw } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
 import { PageShell } from "../components/layout/PageShell";
 import { QuestBoardCard } from "../components/quest/QuestBoardCard";
 import { QuestFilterPanel } from "../components/quest/QuestFilterPanel";
-import { mockQuests } from "../data";
+import { useQuests } from "../features/quests/QuestContext";
 import {
   defaultQuestFilters,
   filterQuests,
@@ -17,11 +17,20 @@ import {
 import { QUEST_STATUSES, type QuestStatus } from "../types";
 
 export function QuestBoardPage() {
+  const {
+    quests,
+    startQuest,
+    completeQuest,
+    archiveQuest,
+    restoreQuest,
+    resetQuests,
+  } = useQuests();
+
   const [filters, setFilters] = useState(defaultQuestFilters);
 
   const filteredQuests = useMemo(() => {
-    return filterQuests(mockQuests, filters);
-  }, [filters]);
+    return filterQuests(quests, filters);
+  }, [quests, filters]);
 
   const filteredXp = useMemo(() => {
     return getFilteredQuestXp(filteredQuests);
@@ -75,19 +84,30 @@ export function QuestBoardPage() {
           </h3>
         </div>
 
-        <Link
-          to="/quests/new"
-          className="inline-flex items-center gap-2 border border-[#a3ff12] bg-[#a3ff12] px-5 py-3 font-mono text-sm font-black uppercase tracking-[0.2em] text-black transition hover:translate-x-1 hover:translate-y-1"
-        >
-          <PlusSquare className="size-4" />
-          Create Quest
-        </Link>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={resetQuests}
+            className="inline-flex items-center gap-2 border border-zinc-700 bg-black px-5 py-3 font-mono text-sm font-black uppercase tracking-[0.2em] text-zinc-400 transition hover:border-white hover:text-white"
+          >
+            <RotateCcw className="size-4" />
+            Reset Data
+          </button>
+
+          <Link
+            to="/quests/new"
+            className="inline-flex items-center gap-2 border border-[#a3ff12] bg-[#a3ff12] px-5 py-3 font-mono text-sm font-black uppercase tracking-[0.2em] text-black transition hover:translate-x-1 hover:translate-y-1"
+          >
+            <PlusSquare className="size-4" />
+            Create Quest
+          </Link>
+        </div>
       </div>
 
       <QuestFilterPanel
         filters={filters}
         resultCount={filteredQuests.length}
-        totalCount={mockQuests.length}
+        totalCount={quests.length}
         totalXp={filteredXp}
         onSearchChange={handleSearchChange}
         onDifficultyChange={handleDifficultyChange}
@@ -102,6 +122,10 @@ export function QuestBoardPage() {
             key={status}
             status={status}
             quests={getQuestsByStatus(filteredQuests, status)}
+            onStartQuest={startQuest}
+            onCompleteQuest={completeQuest}
+            onArchiveQuest={archiveQuest}
+            onRestoreQuest={restoreQuest}
           />
         ))}
       </div>
@@ -112,9 +136,20 @@ export function QuestBoardPage() {
 type QuestStatusColumnProps = {
   status: QuestStatus;
   quests: ReturnType<typeof getQuestsByStatus>;
+  onStartQuest: (questId: string) => void;
+  onCompleteQuest: (questId: string) => void;
+  onArchiveQuest: (questId: string) => void;
+  onRestoreQuest: (questId: string) => void;
 };
 
-function QuestStatusColumn({ status, quests }: QuestStatusColumnProps) {
+function QuestStatusColumn({
+  status,
+  quests,
+  onStartQuest,
+  onCompleteQuest,
+  onArchiveQuest,
+  onRestoreQuest,
+}: QuestStatusColumnProps) {
   return (
     <section className="min-h-140 border-2 border-zinc-800 bg-[#0b0b0b] p-4 shadow-[6px_6px_0_#1f1f1f]">
       <div className="mb-5 flex items-center justify-between border-b border-zinc-800 pb-4">
@@ -130,7 +165,14 @@ function QuestStatusColumn({ status, quests }: QuestStatusColumnProps) {
       {quests.length > 0 ? (
         <div className="space-y-4">
           {quests.map((quest) => (
-            <QuestBoardCard key={quest.id} quest={quest} />
+            <QuestBoardCard
+              key={quest.id}
+              quest={quest}
+              onStartQuest={onStartQuest}
+              onCompleteQuest={onCompleteQuest}
+              onArchiveQuest={onArchiveQuest}
+              onRestoreQuest={onRestoreQuest}
+            />
           ))}
         </div>
       ) : (

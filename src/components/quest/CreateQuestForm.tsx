@@ -68,21 +68,25 @@ export function CreateQuestForm({ onSubmit }: CreateQuestFormProps) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const validationErrors = validateCreateQuestInput(formValues);
-    setErrors(validationErrors);
-
-    if (hasCreateQuestErrors(validationErrors)) {
-      return;
-    }
-
-    onSubmit({
+    const cleanedValues: CreateQuestInput = {
       ...formValues,
       title: formValues.title.trim(),
       description: formValues.description.trim(),
       estimatedTime: formValues.estimatedTime.trim(),
       notes: formValues.notes.trim(),
       solutionUrl: formValues.solutionUrl.trim(),
-    });
+    };
+
+    const validationErrors = validateCreateQuestInput(cleanedValues);
+    setErrors(validationErrors);
+
+    if (hasCreateQuestErrors(validationErrors)) {
+      return;
+    }
+
+    onSubmit(cleanedValues);
+    setFormValues(initialFormValues);
+    setErrors({});
   }
 
   function handleReset() {
@@ -109,13 +113,13 @@ export function CreateQuestForm({ onSubmit }: CreateQuestFormProps) {
           </h3>
 
           <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-500">
-            Define the challenge, assign XP, choose a topic, and prepare the
-            quest for your future local quest state system.
+            Define the challenge, assign XP, choose a topic, and add it to your
+            local quest state.
           </p>
         </div>
 
         <div className="border border-[#a3ff12] bg-black px-4 py-3 font-mono text-xs font-black uppercase tracking-[0.2em] text-[#a3ff12]">
-          Draft Mode
+          Local State
         </div>
       </div>
 
@@ -276,7 +280,7 @@ export function CreateQuestForm({ onSubmit }: CreateQuestFormProps) {
               className="flex h-12 flex-1 items-center justify-center gap-2 border border-[#a3ff12] bg-[#a3ff12] font-mono text-xs font-black uppercase tracking-[0.18em] text-black transition hover:translate-x-1 hover:translate-y-1"
             >
               <Save className="size-4" />
-              Save Draft
+              Create
             </button>
           </div>
         </aside>

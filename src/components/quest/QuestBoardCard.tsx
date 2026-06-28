@@ -1,4 +1,12 @@
-import { ArrowUpRight, Clock3, FileText } from "lucide-react";
+import {
+  ArrowUpRight,
+  Archive,
+  CheckCircle2,
+  Clock3,
+  FileText,
+  Play,
+  RotateCcw,
+} from "lucide-react";
 import { Link } from "react-router";
 import type { Quest } from "../../types";
 import { DifficultyBadge } from "./DifficultyBadge";
@@ -6,9 +14,19 @@ import { StatusBadge } from "./StatusBadge";
 
 type QuestBoardCardProps = {
   quest: Quest;
+  onStartQuest: (questId: string) => void;
+  onCompleteQuest: (questId: string) => void;
+  onArchiveQuest: (questId: string) => void;
+  onRestoreQuest: (questId: string) => void;
 };
 
-export function QuestBoardCard({ quest }: QuestBoardCardProps) {
+export function QuestBoardCard({
+  quest,
+  onStartQuest,
+  onCompleteQuest,
+  onArchiveQuest,
+  onRestoreQuest,
+}: QuestBoardCardProps) {
   return (
     <article className="group border border-zinc-800 bg-black p-4 transition hover:border-[#a3ff12] hover:shadow-[5px_5px_0_#a3ff12]">
       <div className="flex items-start justify-between gap-4">
@@ -50,7 +68,41 @@ export function QuestBoardCard({ quest }: QuestBoardCardProps) {
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-between borderr-t border-zinc-900 pt-4">
+      <div className="mt-4 flex flex-wrap gap-2 border-t border-zinc-900 pt-4">
+        {quest.status === "Not Started" ? (
+          <QuestActionButton
+            label="Start"
+            icon={<Play className="size-3.5" />}
+            onClick={() => onStartQuest(quest.id)}
+          />
+        ) : null}
+
+        {quest.status === "Not Started" || quest.status === "In Progress" ? (
+          <QuestActionButton
+            label="Complete"
+            icon={<CheckCircle2 className="size-3.5" />}
+            onClick={() => onCompleteQuest(quest.id)}
+          />
+        ) : null}
+
+        {quest.status !== "Archived" ? (
+          <QuestActionButton
+            label="Archive"
+            icon={<Archive className="size-3.5" />}
+            onClick={() => onArchiveQuest(quest.id)}
+          />
+        ) : null}
+
+        {quest.status === "Archived" ? (
+          <QuestActionButton
+            label="Restore"
+            icon={<RotateCcw className="size-3.5" />}
+            onClick={() => onRestoreQuest(quest.id)}
+          />
+        ) : null}
+      </div>
+
+      <div className="mt-4 flex items-center justify-between border-t border-zinc-900 pt-4">
         <div className="flex items-center gap-3 text-zinc-600">
           <div className="flex items-center gap-1.5">
             <Clock3 className="size-3.5" />
@@ -78,5 +130,24 @@ export function QuestBoardCard({ quest }: QuestBoardCardProps) {
         </Link>
       </div>
     </article>
+  );
+}
+
+type QuestActionButtonProps = {
+  label: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+};
+
+function QuestActionButton({ label, icon, onClick }: QuestActionButtonProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex items-center gap-2 border border-zinc-800 bg-[#050505] px-3 py-2 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-zinc-400 transition hover:border-[#a3ff12] hover:text-[#a3ff12]"
+    >
+      {icon}
+      {label}
+    </button>
   );
 }

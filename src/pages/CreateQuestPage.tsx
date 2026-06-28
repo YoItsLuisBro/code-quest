@@ -1,15 +1,17 @@
-import { useState } from "react";
+import { Link } from "react-router";
 import { PageShell } from "../components/layout/PageShell";
 import { CreateQuestForm } from "../components/quest/CreateQuestForm";
-import type { CreateQuestInput } from "../types";
+import { useQuests } from "../features/quests/QuestContext";
+import type { CreateQuestInput, Quest } from "../types";
+import { useState } from "react";
 
 export function CreateQuestPage() {
-  const [preapredQuest, setPreparedQuest] = useState<CreateQuestInput | null>(
-    null,
-  );
+  const { createQuest } = useQuests();
+  const [createdQuest, setCreatedQuest] = useState<Quest | null>(null);
 
   function handleCreateQuest(questInput: CreateQuestInput) {
-    setPreparedQuest(questInput);
+    const newQuest = createQuest(questInput);
+    setCreatedQuest(newQuest);
   }
 
   return (
@@ -19,42 +21,49 @@ export function CreateQuestPage() {
       description="Create a new coding challenge with a title, difficulty, topic, XP value, estimated time, notes, and solution link."
     >
       <div className="space-y-6">
-        {preapredQuest ? (
+        {createdQuest ? (
           <section className="border-2 border-[#a3ff12] bg-black p-6 shadow-[8px_8px_0_#a3ff12]">
             <p className="font-mono text-xs uppercase tracking-[0.3em] text-[#a3ff12]">
-              Quest Draft Prepared
+              Quest Created
             </p>
 
             <div className="mt-4 flex items-start justify-between gap-8">
               <div>
                 <h3 className="font-mono text-3xl font-black tracking-[-0.06em] text-white">
-                  {preapredQuest.title}
+                  {createdQuest.title}
                 </h3>
 
                 <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-400">
-                  This quest has passed validation. In Phase 7, we will connect
-                  this form to local quest state so it appears on the Dashboard
-                  and Quest Board.
+                  Your quest has been added to local state. It will now appear
+                  on the Dashboard and Quest Board until the page is refreshed.
+                  Persistence arrives in Phase 10.
                 </p>
 
-                <div className="grid grid-cols-4 gap-3">
-                  <PreparedQuestStat
-                    label="Difficulty"
-                    value={preapredQuest.difficulty}
-                  />
-                  <PreparedQuestStat
-                    label="Topic"
-                    value={preapredQuest.topic}
-                  />
-                  <PreparedQuestStat
-                    label="XP"
-                    value={`+{preapredQuest.xp}XP`}
-                  />
-                  <PreparedQuestStat
-                    label="Time"
-                    value={preapredQuest.estimatedTime}
-                  />
+                <div className="mt-5 flex gap-3">
+                  <Link
+                    to={`/quests/${createdQuest.id}`}
+                    className="inline-flex border border-[#a3ff12] bg-[#a3ff12] px-4 py-3 font-mono text-xs font-black uppercase tracking-[0.18em] text-black"
+                  >
+                    Open Quest
+                  </Link>
+
+                  <Link
+                    to="/quests"
+                    className="inline-flex border border-zinc-700 bg-black px-4 py-3 font-mono text-xs font-black uppercase tracking-[0.18em] text-zinc-300 transition hover:border-white hover:text-white"
+                  >
+                    View Board
+                  </Link>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-4 gap-3">
+                <CreatedQuestStat
+                  label="Difficulty"
+                  value={createdQuest.difficulty}
+                />
+                <CreatedQuestStat label="Topic" value={createdQuest.topic} />
+                <CreatedQuestStat label="XP" value={`+${createdQuest.xp} XP`} />
+                <CreatedQuestStat label="Status" value={createdQuest.status} />
               </div>
             </div>
           </section>
@@ -66,12 +75,12 @@ export function CreateQuestPage() {
   );
 }
 
-type PreparedQuestStatProps = {
+type CreatedQuestStatProps = {
   label: string;
   value: string;
 };
 
-function PreparedQuestStat({ label, value }: PreparedQuestStatProps) {
+function CreatedQuestStat({ label, value }: CreatedQuestStatProps) {
   return (
     <div className="min-w-32 border border-zinc-800 bg-[#050505] px-4 py-3">
       <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-600">
